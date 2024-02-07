@@ -1,0 +1,75 @@
+# Import the modules
+from telegram.ext import Updater, CommandHandler, MessageHandler, Filters
+from telegram import ReplyKeyboardMarkup, ParseMode
+import logging
+
+# Enable logging
+logging.basicConfig(format='%(asctime)s - %(name)s - %(levelname)s - %(message)s',
+                    level=logging.INFO)
+
+# Create the updater and the dispatcher
+updater = Updater(token='YOUR_BOT_TOKEN', use_context=True)
+dispatcher = updater.dispatcher
+
+# Define the keyboard options
+keyboard = [['IMEI Services', 'Check Your Account Balance'],
+            ['Visit Server for More']]
+
+# Define the reply markup
+reply_markup = ReplyKeyboardMarkup(keyboard, one_time_keyboard=False)
+
+# Define the start function
+def start(update, context):
+    # Send a welcome message with the keyboard options
+    context.bot.send_message(chat_id=update.effective_chat.id,
+                             text="Welcome to Zwanski Bot. Please choose an action from the keyboard below.",
+                             reply_markup=reply_markup)
+
+# Define the IMEI function
+def imei(update, context):
+    # Send a message with the IMEI service information
+    context.bot.send_message(chat_id=update.effective_chat.id,
+                             text="*IMEI Services*\n\n"
+                                  "We provide IMEI check and unlock services for all kinds of devices.\n\n"
+                                  "To check your IMEI, dial *#06#* on your phone and send us the 15-digit number.\n\n"
+                                  "To unlock your device, send us your IMEI number and the network provider you want to switch to.\n\n"
+                                  "We will reply with the price and the estimated time for the service.",
+                             parse_mode=ParseMode.MARKDOWN)
+
+# Define the balance function
+def balance(update, context):
+    # Send a message with the account balance information
+    context.bot.send_message(chat_id=update.effective_chat.id,
+                             text="*Check Your Account Balance*\n\n"
+                                  "To check your account balance, please visit our website and log in with your credentials.\n\n"
+                                  "You can also top up your account balance using PayPal or credit card.\n\n"
+                                  "If you have any questions or issues, please contact our customer support.",
+                             parse_mode=ParseMode.MARKDOWN)
+
+# Define the server function
+def server(update, context):
+    # Send a message with the server information
+    context.bot.send_message(chat_id=update.effective_chat.id,
+                             text="*Visit Server for More*\n\n"
+                                  "To access more features and services, please visit our server at https://zwanski.com.\n\n"
+                                  "You can find more information about our products, prices, and policies.\n\n"
+                                  "You can also join our community and chat with other users and experts.",
+                             parse_mode=ParseMode.MARKDOWN)
+
+# Define the error callback function
+def error_callback(update, context):
+    # Log the error message with details
+    logging.error('Update "%s" caused error "%s"', update, context.error)
+
+# Add the handlers to the dispatcher
+dispatcher.add_handler(CommandHandler('start', start))
+dispatcher.add_handler(MessageHandler(Filters.regex('IMEI Services'), imei))
+dispatcher.add_handler(MessageHandler(Filters.regex('Check Your Account Balance'), balance))
+dispatcher.add_handler(MessageHandler(Filters.regex('Visit Server for More'), server))
+dispatcher.add_error_handler(error_callback)
+
+# Start the bot
+updater.start_polling()
+
+# Run the bot until you press Ctrl-C
+updater.idle()
